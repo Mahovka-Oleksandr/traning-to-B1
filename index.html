@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Тренажер з німецької мови (Рівень B1)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-100 min-h-screen flex items-center justify-center p-4">
+  <div class="max-w-2xl w-full bg-white rounded-2xl shadow-xl p-6 md:p-8 my-6">
+    
+    <!-- Header -->
+    <div class="text-center mb-6">
+      <span class="inline-block px-3 py-1 bg-amber-100 text-amber-800 text-xs font-semibold rounded-full uppercase tracking-wider mb-2">
+        Deutsch B1 Trainer
+      </span>
+      <h1 class="text-2xl md:text-3xl font-bold text-slate-800">Тренажер німецької мови B1</h1>
+      <p class="text-slate-500 text-sm mt-1">Пройдіть тест для визначення вашого рівня (A2 чи B1)</p>
+    </div>
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="text-center py-6">
+      <div class="w-20 h-20 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl font-bold">
+        🇩🇪
+      </div>
+      <p class="text-slate-600 mb-6 max-w-md mx-auto">
+        Тест складається з 12 завдань на граматику та лексику рівня B1 (Passiv, Konjunktiv II, Nebensätze, Relativsätze тощо).
+      </p>
+      <button id="start-btn" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-3 px-8 rounded-xl transition duration-200 shadow-md">
+        Розпочати тест
+      </button>
+    </div>
+
+    <!-- Quiz Screen -->
+    <div id="quiz-screen" class="hidden">
+      <!-- Progress Bar -->
+      <div class="mb-6">
+        <div class="flex justify-between text-xs font-semibold text-slate-500 mb-2">
+          <span id="question-number">Питання 1 з 12</span>
+          <span id="score-counter">Бал: 0</span>
+        </div>
+        <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+          <div id="progress-bar" class="bg-amber-500 h-2.5 rounded-full transition-all duration-300" style="width: 8%"></div>
+        </div>
+      </div>
+
+      <!-- Question Box -->
+      <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 mb-6">
+        <p id="question-text" class="text-lg font-medium text-slate-800 mb-2"></p>
+        <p id="question-hint" class="text-xs text-slate-400 italic"></p>
+      </div>
+
+      <!-- Answer Options -->
+      <div id="options-container" class="space-y-3 mb-6"></div>
+
+      <!-- Feedback Area -->
+      <div id="feedback" class="hidden rounded-xl p-4 mb-6 border"></div>
+
+      <!-- Next Button -->
+      <button id="next-btn" class="hidden w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-3 px-6 rounded-xl transition duration-200">
+        Наступне питання →
+      </button>
+    </div>
+
+    <!-- Result Screen -->
+    <div id="result-screen" class="hidden text-center py-6">
+      <div id="result-badge" class="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl font-extrabold shadow-inner">
+      </div>
+      <h2 id="result-title" class="text-2xl font-bold text-slate-800 mb-2"></h2>
+      <p id="result-description" class="text-slate-600 mb-6 max-w-md mx-auto"></p>
+      
+      <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-6 text-left max-w-sm mx-auto space-y-2 text-sm">
+        <div class="flex justify-between">
+          <span class="text-slate-500">Правильних відповідей:</span>
+          <span id="final-score" class="font-bold text-slate-800"></span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-500">Відсоток успішності:</span>
+          <span id="final-percentage" class="font-bold text-slate-800"></span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-500">Присвоєний рівень:</span>
+          <span id="final-level" class="font-bold"></span>
+        </div>
+      </div>
+
+      <button id="restart-btn" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-3 px-8 rounded-xl transition duration-200 shadow-md">
+        Пройти ще раз
+      </button>
+    </div>
+
+  </div>
+
+  <script>
+    const questions = [
+      {
+        question: "Er spricht sehr gut Deutsch, ______ er erst seit sechs Monaten in Deutschland lebt.",
+        hint: "Непрямий порядок слів / сполучник причини/допусту",
+        options: [
+          { text: "weil", isCorrect: false },
+          { text: "obwohl", isCorrect: true },
+          { text: "deshalb", isCorrect: false },
+          { text: "trotzdem", isCorrect: false }
+        ],
+        explanation: "'obwohl' означає 'хоча' і вводить підрядне речення (дієслово в кінці)."
+      },
+      {
+        question: "Wenn ich mehr Zeit hätte, ______ ich einen Deutschkurs machen.",
+        hint: "Konjunktiv II (умовний спосіб)",
+        options: [
+          { text: "würde", isCorrect: true },
+          { text: "werde", isCorrect: false },
+          { text: "hatte", isCorrect: false },
+          { text: "kann", isCorrect: false }
+        ],
+        explanation: "Для вираження бажання або гіпотетичної дії в Konjunktiv II використовується 'würde' + Infinitiv."
+      },
+      {
+        question: "Das neue Rathaus ______ im letzten Jahr gebaut.",
+        hint: "Passiv Präteritum (Пасивний стан)",
+        options: [
+          { text: "wird", isCorrect: false },
+          { text: "ist", isCorrect: false },
+          { text: "wurde", isCorrect: true },
+          { text: "hat", isCorrect: false }
+        ],
+        explanation: "Пасивний стан у минулому часі (Präteritum) утворюється: 'wurde' + Partizip II."
+      },
+      {
+        question: "Der Mann, ______ dort drüben steht, ist mein Deutschlehrer.",
+        hint: "Relativpronomen (Відносний займенник u Nominativ)",
+        options: [
+          { text: "den", isCorrect: false },
+          { text: "dem", isCorrect: false },
+          { text: "der", isCorrect: true },
+          { text: "dessen", isCorrect: false }
+        ],
+        explanation: "Займенник вказує на 'Mann' (чоловічий рід, підмет -> Nominativ: 'der')."
+      },
+      {
+        question: "Ich freue mich schon sehr ______ die bevorstehenden Sommerferien.",
+        hint: "Verben mit Präpositionen (Дієслова з прийменниками)",
+        options: [
+          { text: "auf", isCorrect: true },
+          { text: "über", isCorrect: false },
+          { text: "für", isCorrect: false },
+          { text: "an", isCorrect: false }
+        ],
+        explanation: "'sich freuen auf' (Akkusativ) виражає радісне очікування події в майбутньому."
+      },
+      {
+        question: "Er ist ohne ein Wort zu sagen ______. ",
+        hint: "Infinitiv mit 'zu' / ohne...zu",
+        options: [
+          { text: "gegangen", isCorrect: true },
+          { text: "gehen", isCorrect: false },
+          { text: "geht", isCorrect: false },
+          { text: "ging", isCorrect: false }
+        ],
+        explanation: "Конструкція 'ohne... zu' + Infinitiv описує супутню дію (або її відсутність), основна частина залишається в Perfekt ('ist gegangen')."
+      },
+      {
+        question: "Je mehr man übt, ______ besser wird man.",
+        hint: "Подвійний сполучник (je... desto/umso)",
+        options: [
+          { text: "desto", isCorrect: true },
+          { text: "wie", isCorrect: false },
+          { text: "als", isCorrect: false },
+          { text: "dass", isCorrect: false }
+        ],
+        explanation: "Парна конструкція порівняння: 'Je' + вищий ступінь ..., 'desto' (або 'umso') + вищий ступінь."
+      },
+      {
+        question: "Er hat versprochen, pünktlich zum Treffen ______.",
+        hint: "Infinitiv mit 'zu'",
+        options: [
+          { text: "kommen", isCorrect: false },
+          { text: "zu kommen", isCorrect: true },
+          { text: "gekommen", isCorrect: false },
+          { text: "anzukommen", isCorrect: false }
+        ],
+        explanation: "Дієслово 'versprechen' вимагає після себе інфінітивної групи з 'zu'."
+      },
+      {
+        question: "Das ist die Frau, ______ Auto gestern gestohlen wurde.",
+        hint: "Relativpronomen im Genitiv",
+        options: [
+          { text: "die", isCorrect: false },
+          { text: "der", isCorrect: false },
+          { text: "deren", isCorrect: true },
+          { text: "dessen", isCorrect: false }
+        ],
+        explanation: "Для жіночого роду в Genitiv використовується відносний займенник 'deren' ('машина якої')."
+      },
+      {
+        question: "An deiner Stelle ______ ich sofort einen Arzt aufsuchen.",
+        hint: "Ratschlag geben (Konjunktiv II)",
+        options: [
+          { text: "würde", isCorrect: true },
+          { text: "sollte", isCorrect: false },
+          { text: "könnte", isCorrect: false },
+          { text: "wollte", isCorrect: false }
+        ],
+        explanation: "Фраза 'An deiner Stelle würde ich...' — стандартна формула для надання поради в німецькій мові."
+      },
+      {
+        question: "Wir bleiben zu Hause, ______ es stark regnet.",
+        hint: "Kausalsatz (Причина)",
+        options: [
+          { text: "deshalb", isCorrect: false },
+          { text: "weil", isCorrect: true },
+          { text: "denn", isCorrect: false },
+          { text: "obwohl", isCorrect: false }
+        ],
+        explanation: "'weil' виражає причину і ставить дієслово 'regnet' на останнє місце."
+      },
+      {
+        question: "Ich interessiere mich sehr ______ moderne Kunst.",
+        hint: "Verben mit Präpositionen (sich interessieren)",
+        options: [
+          { text: "für", isCorrect: true },
+          { text: "über", isCorrect: false },
+          { text: "an", isCorrect: false },
+          { text: "mit", isCorrect: false }
+        ],
+        explanation: "Дієслово 'sich interessieren' завжди вживається з прийменником 'für' + Akkusativ."
+      }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let selectedOption = null;
+
+    const startScreen = document.getElementById('start-screen');
+    const quizScreen = document.getElementById('quiz-screen');
+    const resultScreen = document.getElementById('result-screen');
+
+    const startBtn = document.getElementById('start-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const restartBtn = document.getElementById('restart-btn');
+
+    const questionNumber = document.getElementById('question-number');
+    const scoreCounter = document.getElementById('score-counter');
+    const progressBar = document.getElementById('progress-bar');
+    const questionText = document.getElementById('question-text');
+    const questionHint = document.getElementById('question-hint');
+    const optionsContainer = document.getElementById('options-container');
+    const feedback = document.getElementById('feedback');
+
+    startBtn.addEventListener('click', startQuiz);
+    nextBtn.addEventListener('click', nextQuestion);
+    restartBtn.addEventListener('click', startQuiz);
+
+    function startQuiz() {
+      currentQuestionIndex = 0;
+      score = 0;
+      startScreen.classList.add('hidden');
+      resultScreen.classList.add('hidden');
+      quizScreen.classList.remove('hidden');
+      showQuestion();
+    }
+
+    function showQuestion() {
+      selectedOption = null;
+      feedback.classList.add('hidden');
+      nextBtn.classList.add('hidden');
+
+      const q = questions[currentQuestionIndex];
+      questionNumber.textContent = `Питання ${currentQuestionIndex + 1} з ${questions.length}`;
+      scoreCounter.textContent = `Бал: ${score}`;
+      progressBar.style.width = `${((currentQuestionIndex + 1) / questions.length) * 100}%`;
+
+      questionText.textContent = q.question;
+      questionHint.textContent = q.hint ? `Підказка: ${q.hint}` : '';
+
+      optionsContainer.innerHTML = '';
+      q.options.forEach((opt, index) => {
+        const btn = document.createElement('button');
+        btn.className = "w-full text-left p-4 rounded-xl border border-slate-200 hover:border-amber-400 hover:bg-amber-50 transition font-medium text-slate-700 flex justify-between items-center";
+        btn.textContent = opt.text;
+        btn.addEventListener('click', () => selectAnswer(index, btn));
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    function selectAnswer(index, btnElement) {
+      if (selectedOption !== null) return; // Prevent multiple choices
+
+      selectedOption = index;
+      const q = questions[currentQuestionIndex];
+      const isCorrect = q.options[index].isCorrect;
+      const optionButtons = optionsContainer.children;
+
+      for (let i = 0; i < optionButtons.length; i++) {
+        optionButtons[i].disabled = true;
+        if (q.options[i].isCorrect) {
+          optionButtons[i].classList.add('bg-emerald-100', 'border-emerald-500', 'text-emerald-800');
+        } else if (i === index && !isCorrect) {
+          optionButtons[i].classList.add('bg-rose-100', 'border-rose-500', 'text-rose-800');
+        } else {
+          optionButtons[i].classList.add('opacity-50');
+        }
+      }
+
+      if (isCorrect) {
+        score++;
+        feedback.className = "rounded-xl p-4 mb-6 border bg-emerald-50 border-emerald-200 text-emerald-900";
+        feedback.innerHTML = `<strong>Вірно!</strong> ${q.explanation}`;
+      } else {
+        feedback.className = "rounded-xl p-4 mb-6 border bg-rose-50 border-rose-200 text-rose-900";
+        feedback.innerHTML = `<strong>Невірно.</strong> ${q.explanation}`;
+      }
+
+      scoreCounter.textContent = `Бал: ${score}`;
+      feedback.classList.remove('hidden');
+      nextBtn.classList.remove('hidden');
+    }
+
+    function nextQuestion() {
+      currentQuestionIndex++;
+      if (currentQuestionIndex < questions.length) {
+        showQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function showResults() {
+      quizScreen.classList.add('hidden');
+      resultScreen.classList.remove('hidden');
+
+      const percentage = Math.round((score / questions.length) * 100);
+      const passedB1 = percentage >= 65; // Threshold for B1
+
+      const resultBadge = document.getElementById('result-badge');
+      const resultTitle = document.getElementById('result-title');
+      const resultDescription = document.getElementById('result-description');
+      const finalScore = document.getElementById('final-score');
+      const finalPercentage = document.getElementById('final-percentage');
+      const finalLevel = document.getElementById('final-level');
+
+      finalScore.textContent = `${score} / ${questions.length}`;
+      finalPercentage.textContent = `${percentage}%`;
+
+      if (passedB1) {
+        resultBadge.className = "w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl font-extrabold shadow-inner bg-emerald-100 text-emerald-600";
+        resultBadge.textContent = "B1";
+        resultTitle.textContent = "Вітаємо! Ваш рівень — B1";
+        resultDescription.textContent = "Ви впевнено володієте основними граматичними структурами та лексикою рівня B1. Продовжуйте в тому ж дусі!";
+        finalLevel.textContent = "B1 (Підтверджено)";
+        finalLevel.className = "font-bold text-emerald-600";
+      } else {
+        resultBadge.className = "w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl font-extrabold shadow-inner bg-amber-100 text-amber-600";
+        resultBadge.textContent = "A2";
+        resultTitle.textContent = "Ваш рівень — A2";
+        resultDescription.textContent = "Ви маєте хорошу базу A2, але для повноцінного B1 варто додатково повторити складові речення, Passiv та Konjunktiv II.";
+        finalLevel.textContent = "A2 (Потребує практики для B1)";
+        finalLevel.className = "font-bold text-amber-600";
+      }
+    }
+  </script>
+</body>
+</html>
