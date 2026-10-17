@@ -1,36 +1,62 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="uk" class="light">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Optimized viewport for mobile screens including mobile web app viewport standards -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Тренажер з німецької мови (Рівень B1)</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+    }
+  </script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    body { font-family: 'Inter', sans-serif; }
+    body { 
+      font-family: 'Inter', sans-serif;
+      /* Prevent unwanted tap highlight flash on mobile touch */
+      -webkit-tap-highlight-color: transparent;
+      /* Custom touch response feel */
+      touch-action: manipulation;
+    }
+    
+    /* Support for mobile notch / safe areas */
+    .pb-safe {
+      padding-bottom: env(safe-area-inset-bottom, 1rem);
+    }
+    .pt-safe {
+      padding-top: env(safe-area-inset-top, 1rem);
+    }
   </style>
 </head>
-<body class="bg-slate-100 min-h-screen flex items-center justify-center p-4">
-  <div class="max-w-2xl w-full bg-white rounded-2xl shadow-xl p-6 md:p-8 my-6">
+<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col justify-between p-3 sm:p-4 transition-colors duration-300 pb-safe pt-safe select-none">
+  
+  <div class="max-w-2xl w-full mx-auto bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-4 sm:p-6 md:p-8 my-auto transition-colors duration-300 relative border border-slate-200/50 dark:border-slate-700/50">
     
+    <!-- Theme Toggle Button - Positioned & sized comfortably for mobile thumb tap -->
+    <button id="theme-toggle" aria-label="Переключити тему" class="absolute top-4 right-4 sm:top-6 sm:right-6 w-11 h-11 sm:w-10 sm:h-10 rounded-xl bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 active:scale-95 text-slate-800 dark:text-amber-400 flex items-center justify-center text-xl transition-all shadow-sm z-10 touch-manipulation">
+      <span id="theme-icon">🌙</span>
+    </button>
+
     <!-- Header -->
-    <div class="text-center mb-6">
-      <span class="inline-block px-3 py-1 bg-amber-100 text-amber-800 text-xs font-semibold rounded-full uppercase tracking-wider mb-2">
+    <div class="text-center mb-5 sm:mb-6 pr-10 sm:pr-0">
+      <span class="inline-block px-2.5 py-1 bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300 text-[10px] sm:text-xs font-bold rounded-full uppercase tracking-wider mb-2">
         Deutsch B1 Trainer
       </span>
-      <h1 class="text-2xl md:text-3xl font-bold text-slate-800">Тренажер німецької мови B1</h1>
-      <p class="text-slate-500 text-sm mt-1">Пройдіть тест для визначення вашого рівня (A2 чи B1)</p>
+      <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-slate-800 dark:text-white leading-tight">Тренажер німецької мови B1</h1>
+      <p class="text-slate-500 dark:text-slate-400 text-xs sm:text-sm mt-1">Пройдіть тест для визначення вашого рівня (A2 чи B1)</p>
     </div>
 
     <!-- Start Screen -->
-    <div id="start-screen" class="text-center py-6">
-      <div class="w-20 h-20 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl font-bold">
+    <div id="start-screen" class="text-center py-4 sm:py-6">
+      <div class="w-16 h-16 sm:w-20 sm:h-20 bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl sm:text-3xl font-bold">
         🇩🇪
       </div>
-      <p class="text-slate-600 mb-6 max-w-md mx-auto">
-        Тест складається з 12 завдань на граматику та лексику рівня B1 (Passiv, Konjunktiv II, Nebensätze, Relativsätze тощо).
+      <p class="text-slate-600 dark:text-slate-300 text-sm sm:text-base mb-6 max-w-md mx-auto leading-relaxed px-2">
+        Тест містить <strong>12 випадкових завдань</strong> з банку питань (Passiv, Konjunktiv II, Nebensätze, Relativsätze, Genitiv тощо).
       </p>
-      <button id="start-btn" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-3 px-8 rounded-xl transition duration-200 shadow-md">
+      <button id="start-btn" class="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 active:scale-98 text-white font-semibold py-3.5 px-8 rounded-xl transition-all duration-200 shadow-md text-base touch-manipulation">
         Розпочати тест
       </button>
     </div>
@@ -38,71 +64,100 @@
     <!-- Quiz Screen -->
     <div id="quiz-screen" class="hidden">
       <!-- Progress Bar -->
-      <div class="mb-6">
-        <div class="flex justify-between text-xs font-semibold text-slate-500 mb-2">
+      <div class="mb-4 sm:mb-6">
+        <div class="flex justify-between text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2">
           <span id="question-number">Питання 1 з 12</span>
           <span id="score-counter">Бал: 0</span>
         </div>
-        <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+        <div class="w-full bg-slate-200 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden">
           <div id="progress-bar" class="bg-amber-500 h-2.5 rounded-full transition-all duration-300" style="width: 8%"></div>
         </div>
       </div>
 
       <!-- Question Box -->
-      <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 mb-6">
-        <p id="question-text" class="text-lg font-medium text-slate-800 mb-2"></p>
-        <p id="question-hint" class="text-xs text-slate-400 italic"></p>
+      <div class="bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4 sm:p-5 mb-4 sm:mb-6">
+        <p id="question-text" class="text-base sm:text-lg font-medium text-slate-800 dark:text-slate-100 mb-1.5 leading-snug"></p>
+        <p id="question-hint" class="text-xs text-slate-400 dark:text-slate-400 italic"></p>
       </div>
 
-      <!-- Answer Options -->
-      <div id="options-container" class="space-y-3 mb-6"></div>
+      <!-- Answer Options (Optimized for touch targets on mobile) -->
+      <div id="options-container" class="space-y-2.5 sm:space-y-3 mb-4 sm:mb-6"></div>
 
       <!-- Feedback Area -->
-      <div id="feedback" class="hidden rounded-xl p-4 mb-6 border"></div>
+      <div id="feedback" class="hidden rounded-xl p-3.5 sm:p-4 mb-4 sm:mb-6 border text-xs sm:text-sm leading-relaxed"></div>
 
-      <!-- Next Button -->
-      <button id="next-btn" class="hidden w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-3 px-6 rounded-xl transition duration-200">
+      <!-- Next Button (Large full-width button for smartphones) -->
+      <button id="next-btn" class="hidden w-full bg-slate-800 hover:bg-slate-900 active:scale-98 dark:bg-amber-500 dark:hover:bg-amber-600 text-white font-semibold py-3.5 px-6 rounded-xl transition-all duration-200 text-base shadow-sm touch-manipulation">
         Наступне питання →
       </button>
     </div>
 
     <!-- Result Screen -->
-    <div id="result-screen" class="hidden text-center py-6">
-      <div id="result-badge" class="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl font-extrabold shadow-inner">
+    <div id="result-screen" class="hidden text-center py-4 sm:py-6">
+      <div id="result-badge" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl sm:text-3xl font-extrabold shadow-inner">
       </div>
-      <h2 id="result-title" class="text-2xl font-bold text-slate-800 mb-2"></h2>
-      <p id="result-description" class="text-slate-600 mb-6 max-w-md mx-auto"></p>
+      <h2 id="result-title" class="text-xl sm:text-2xl font-bold text-slate-800 dark:text-white mb-2"></h2>
+      <p id="result-description" class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mb-6 max-w-md mx-auto leading-relaxed px-2"></p>
       
-      <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-6 text-left max-w-sm mx-auto space-y-2 text-sm">
+      <div class="bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4 mb-6 text-left max-w-sm mx-auto space-y-2 text-xs sm:text-sm">
         <div class="flex justify-between">
-          <span class="text-slate-500">Правильних відповідей:</span>
-          <span id="final-score" class="font-bold text-slate-800"></span>
+          <span class="text-slate-500 dark:text-slate-400">Правильних відповідей:</span>
+          <span id="final-score" class="font-bold text-slate-800 dark:text-slate-100"></span>
         </div>
         <div class="flex justify-between">
-          <span class="text-slate-500">Відсоток успішності:</span>
-          <span id="final-percentage" class="font-bold text-slate-800"></span>
+          <span class="text-slate-500 dark:text-slate-400">Відсоток успішності:</span>
+          <span id="final-percentage" class="font-bold text-slate-800 dark:text-slate-100"></span>
         </div>
         <div class="flex justify-between">
-          <span class="text-slate-500">Присвоєний рівень:</span>
+          <span class="text-slate-500 dark:text-slate-400">Присвоєний рівень:</span>
           <span id="final-level" class="font-bold"></span>
         </div>
       </div>
 
-      <button id="restart-btn" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-3 px-8 rounded-xl transition duration-200 shadow-md">
-        Пройти ще раз
+      <button id="restart-btn" class="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 active:scale-98 text-white font-semibold py-3.5 px-8 rounded-xl transition-all duration-200 shadow-md text-base touch-manipulation">
+        Пройти ще раз (з новими питаннями)
       </button>
     </div>
 
   </div>
 
   <script>
-    const questions = [
+    // Theme toggle state logic
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+
+    function initTheme() {
+      if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+        themeIcon.textContent = '☀️';
+      } else {
+        document.documentElement.classList.remove('dark');
+        themeIcon.textContent = '🌙';
+      }
+    }
+
+    themeToggleBtn.addEventListener('click', () => {
+      if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+        themeIcon.textContent = '🌙';
+      } else {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+        themeIcon.textContent = '☀️';
+      }
+    });
+
+    initTheme();
+
+    // Bank of questions
+    const questionBank = [
       {
         question: "Er spricht sehr gut Deutsch, ______ er erst seit sechs Monaten in Deutschland lebt.",
-        hint: "Непрямий порядок слів / сполучник причини/допусту",
+        hint: "Непрямий порядок слів / сполучник допусту",
         options: [
-          { text: "weil", isCorrect: false },
           { text: "obwohl", isCorrect: true },
+          { text: "weil", isCorrect: false },
           { text: "deshalb", isCorrect: false },
           { text: "trotzdem", isCorrect: false }
         ],
@@ -123,9 +178,9 @@
         question: "Das neue Rathaus ______ im letzten Jahr gebaut.",
         hint: "Passiv Präteritum (Пасивний стан)",
         options: [
+          { text: "wurde", isCorrect: true },
           { text: "wird", isCorrect: false },
           { text: "ist", isCorrect: false },
-          { text: "wurde", isCorrect: true },
           { text: "hat", isCorrect: false }
         ],
         explanation: "Пасивний стан у минулому часі (Präteritum) утворюється: 'wurde' + Partizip II."
@@ -134,9 +189,9 @@
         question: "Der Mann, ______ dort drüben steht, ist mein Deutschlehrer.",
         hint: "Relativpronomen (Відносний займенник u Nominativ)",
         options: [
+          { text: "der", isCorrect: true },
           { text: "den", isCorrect: false },
           { text: "dem", isCorrect: false },
-          { text: "der", isCorrect: true },
           { text: "dessen", isCorrect: false }
         ],
         explanation: "Займенник вказує на 'Mann' (чоловічий рід, підмет -> Nominativ: 'der')."
@@ -153,7 +208,7 @@
         explanation: "'sich freuen auf' (Akkusativ) виражає радісне очікування події в майбутньому."
       },
       {
-        question: "Er ist ohne ein Wort zu sagen ______. ",
+        question: "Er ist ohne ein Wort zu sagen ______.",
         hint: "Infinitiv mit 'zu' / ohne...zu",
         options: [
           { text: "gegangen", isCorrect: true },
@@ -161,7 +216,7 @@
           { text: "geht", isCorrect: false },
           { text: "ging", isCorrect: false }
         ],
-        explanation: "Конструкція 'ohne... zu' + Infinitiv описує супутню дію (або її відсутність), основна частина залишається в Perfekt ('ist gegangen')."
+        explanation: "Конструкція 'ohne... zu' + Infinitiv описує супутню дію, основна частина в Perfekt ('ist gegangen')."
       },
       {
         question: "Je mehr man übt, ______ besser wird man.",
@@ -178,8 +233,8 @@
         question: "Er hat versprochen, pünktlich zum Treffen ______.",
         hint: "Infinitiv mit 'zu'",
         options: [
-          { text: "kommen", isCorrect: false },
           { text: "zu kommen", isCorrect: true },
+          { text: "kommen", isCorrect: false },
           { text: "gekommen", isCorrect: false },
           { text: "anzukommen", isCorrect: false }
         ],
@@ -189,9 +244,9 @@
         question: "Das ist die Frau, ______ Auto gestern gestohlen wurde.",
         hint: "Relativpronomen im Genitiv",
         options: [
+          { text: "deren", isCorrect: true },
           { text: "die", isCorrect: false },
           { text: "der", isCorrect: false },
-          { text: "deren", isCorrect: true },
           { text: "dessen", isCorrect: false }
         ],
         explanation: "Для жіночого роду в Genitiv використовується відносний займенник 'deren' ('машина якої')."
@@ -205,22 +260,22 @@
           { text: "könnte", isCorrect: false },
           { text: "wollte", isCorrect: false }
         ],
-        explanation: "Фраза 'An deiner Stelle würde ich...' — стандартна формула для надання поради в німецькій мові."
+        explanation: "Фраза 'An deiner Stelle würde ich...' — стандартна формула для надання поради."
       },
       {
         question: "Wir bleiben zu Hause, ______ es stark regnet.",
         hint: "Kausalsatz (Причина)",
         options: [
-          { text: "deshalb", isCorrect: false },
           { text: "weil", isCorrect: true },
+          { text: "deshalb", isCorrect: false },
           { text: "denn", isCorrect: false },
           { text: "obwohl", isCorrect: false }
         ],
-        explanation: "'weil' виражає причину і ставить дієслово 'regnet' на останнє місце."
+        explanation: "'weil' виражає причину і ставить дієслово на останнє місце."
       },
       {
         question: "Ich interessiere mich sehr ______ moderne Kunst.",
-        hint: "Verben mit Präpositionen (sich interessieren)",
+        hint: "Verben mit Präpositionen",
         options: [
           { text: "für", isCorrect: true },
           { text: "über", isCorrect: false },
@@ -228,9 +283,209 @@
           { text: "mit", isCorrect: false }
         ],
         explanation: "Дієслово 'sich interessieren' завжди вживається з прийменником 'für' + Akkusativ."
+      },
+      {
+        question: "Trotz ______ schlechten Wetters gingen wir im Park spazieren.",
+        hint: "Genitiv nach Präpositionen (Trotz)",
+        options: [
+          { text: "des", isCorrect: true },
+          { text: "dem", isCorrect: false },
+          { text: "das", isCorrect: false },
+          { text: "den", isCorrect: false }
+        ],
+        explanation: "Прийменник 'trotz' вимагає родового відмінка (Genitiv): 'des schlechten Wetters'."
+      },
+      {
+        question: "Ich bitte dich darum, mir den Brief ______.",
+        hint: "Infinitiv mit 'zu' bei trennbaren Verben",
+        options: [
+          { text: "weiterzuleiten", isCorrect: true },
+          { text: "weiter zu leiten", isCorrect: false },
+          { text: "weiterleiten zu", isCorrect: false },
+          { text: "zu weiterleiten", isCorrect: false }
+        ],
+        explanation: "У дієсловах з відокремлюваними префіксами частка 'zu' ставиться між префіксом і коренем: 'weiterzuleiten'."
+      },
+      {
+        question: "Die Aufgaben ______ bis morgen erledigt werden.",
+        hint: "Passiv mit Modalverben",
+        options: [
+          { text: "müssen", isCorrect: true },
+          { text: "werden", isCorrect: false },
+          { text: "haben", isCorrect: false },
+          { text: "sein", isCorrect: false }
+        ],
+        explanation: "Пасив із модальним дієсловом: Modalverb + Partizip II + werden ('müssen erledigt werden')."
+      },
+      {
+        question: "Könnten Sie mir bitte sagen, wo der Bahnhof ______?",
+        hint: "Indirekte Frage (Непряме запитання)",
+        options: [
+          { text: "liegt", isCorrect: true },
+          { text: "ist gelegen", isCorrect: false },
+          { text: "liegt er", isCorrect: false },
+          { text: "er liegt", isCorrect: false }
+        ],
+        explanation: "У непрямому запитанні з питальним словом дієслово йде на самий кінець речення."
+      },
+      {
+        question: "Ich warte auf den Bus, ______ schon seit 20 Minuten Verspätung hat.",
+        hint: "Relativpronomen (Maskulinum, Nominativ)",
+        options: [
+          { text: "der", isCorrect: true },
+          { text: "den", isCorrect: false },
+          { text: "dem", isCorrect: false },
+          { text: "welches", isCorrect: false }
+        ],
+        explanation: "'Bus' — чоловічого роду (der Bus), у відносному реченні це підмет (Nominativ) -> 'der'."
+      },
+      {
+        question: "Er hat mich gefragt, ______ ich morgen Zeit habe.",
+        hint: "Indirekte Ja/Nein-Frage (Сполучник ob)",
+        options: [
+          { text: "ob", isCorrect: true },
+          { text: "dass", isCorrect: false },
+          { text: "wenn", isCorrect: false },
+          { text: "als", isCorrect: false }
+        ],
+        explanation: "Для непрямих запитань без питального слова використовується сполучник 'ob' ('чи')."
+      },
+      {
+        question: "Statt ins Kino ______ gehen, blieb er zu Hause.",
+        hint: "Infinitivkonstruktion (statt... zu)",
+        options: [
+          { text: "zu", isCorrect: true },
+          { text: "um", isCorrect: false },
+          { text: "ohne", isCorrect: false },
+          { text: "für", isCorrect: false }
+        ],
+        explanation: "Конструкція 'statt... zu' означає 'замість того, щоб'."
+      },
+      {
+        question: "Ich danke dir ______ deine große Hilfe.",
+        hint: "Verben mit Präpositionen (danken)",
+        options: [
+          { text: "für", isCorrect: true },
+          { text: "über", isCorrect: false },
+          { text: "auf", isCorrect: false },
+          { text: "an", isCorrect: false }
+        ],
+        explanation: "Дієслово 'danken' вимагає прийменника 'für' + Akkusativ ('подякувати за щось')."
+      },
+      {
+        question: "Er verhielt sich so, als ______ er alles wissen.",
+        hint: "Konjunktiv II mit 'als ob / als'",
+        options: [
+          { text: "würde", isCorrect: true },
+          { text: "wird", isCorrect: false },
+          { text: "hat", isCorrect: false },
+          { text: "kann", isCorrect: false }
+        ],
+        explanation: "Порівняльні речення з 'als' вимагають Konjunktiv II із зміною порядку слів."
+      },
+      {
+        question: "Mein Bruder hilft dem ______ Herrn über die Straße.",
+        hint: "Adjektivdeklination nach dem bestimmten Artikel (Dativ)",
+        options: [
+          { text: "alten", isCorrect: true },
+          { text: "alter", isCorrect: false },
+          { text: "alte", isCorrect: false },
+          { text: "altem", isCorrect: false }
+        ],
+        explanation: "Після визначеного артикля в Dativ ('dem') прикметник завжди отримує закінчення '-en'."
+      },
+      {
+        question: "Ich nehme einen Regenschirm mit, ______ es regnet.",
+        hint: "Finalsatz / Konditionalsatz (falls/falls es)",
+        options: [
+          { text: "falls", isCorrect: true },
+          { text: "damit", isCorrect: false },
+          { text: "obwohl", isCorrect: false },
+          { text: "trotzdem", isCorrect: false }
+        ],
+        explanation: "'falls' означає 'у випадку, якщо' / 'якщо'."
+      },
+      {
+        question: "Wir fahren im Sommer nach Italien, ______ unsere Deutschkenntnisse zu verbessern.",
+        hint: "Finalsatz (um... zu)",
+        options: [
+          { text: "um", isCorrect: true },
+          { text: "damit", isCorrect: false },
+          { text: "dass", isCorrect: false },
+          { text: "für", isCorrect: false }
+        ],
+        explanation: "Конструкція 'um... zu' вказує на мету ('щоб'), коли підмет в обох частинах речення однаковий."
+      },
+      {
+        question: "Der Student, mit ______ ich gesprochen habe, kommt aus Ukraine.",
+        hint: "Relativpronomen mit Präposition (Dativ Maskulinum)",
+        options: [
+          { text: "dem", isCorrect: true },
+          { text: "den", isCorrect: false },
+          { text: "der", isCorrect: false },
+          { text: "dessen", isCorrect: false }
+        ],
+        explanation: "Прийменник 'mit' вимагає Dativ. 'Student' — чоловічий рід (der Student -> dem)."
+      },
+      {
+        question: "Während ______ Urlaubs hat es fast nur geregnet.",
+        hint: "Genitiv nach 'während'",
+        options: [
+          { text: "des", isCorrect: true },
+          { text: "dem", isCorrect: false },
+          { text: "den", isCorrect: false },
+          { text: "der", isCorrect: false }
+        ],
+        explanation: "Прийменник 'während' вимагає Genitiv (der Urlaub -> des Urlaubs)."
+      },
+      {
+        question: "Er erinnert sich noch gut ______ seinen ersten Schultag.",
+        hint: "Verben mit Präpositionen (sich erinnern)",
+        options: [
+          { text: "an", isCorrect: true },
+          { text: "auf", isCorrect: false },
+          { text: "über", isCorrect: false },
+          { text: "mit", isCorrect: false }
+        ],
+        explanation: "'sich erinnern an' + Akkusativ означає 'згадувати про щось/когось'."
+      },
+      {
+        question: "Ich habe gestern einen neuen ______ gesehen.",
+        hint: "N-Deklination (der Kunde / den Kunden)",
+        options: [
+          { text: "Kunden", isCorrect: true },
+          { text: "Kunde", isCorrect: false },
+          { text: "Kundem", isCorrect: false },
+          { text: "Kundes", isCorrect: false }
+        ],
+        explanation: "'der Kunde' належить до N-Deklination, тому в Akkusativ додається закінчення '-n': 'den Kunden'."
+      },
+      {
+        question: "Das Kind wollte nicht schlafen gehen, ______ es sehr müde war.",
+        hint: "Kausalsatz / Konzessivsatz",
+        options: [
+          { text: "obwohl", isCorrect: true },
+          { text: "weil", isCorrect: false },
+          { text: "dass", isCorrect: false },
+          { text: "damit", isCorrect: false }
+        ],
+        explanation: "'obwohl' ('незважаючи на те, що / хоча') створює протиставлення."
+      },
+      {
+        question: "Ich habe mir ein Auto gekauft, ______ ich schneller zur Arbeit kommen kann.",
+        hint: "Finalsatz (damit)",
+        options: [
+          { text: "damit", isCorrect: true },
+          { text: "um", isCorrect: false },
+          { text: "dass", isCorrect: false },
+          { text: "weil", isCorrect: false }
+        ],
+        explanation: "'damit' використовується для вираження мети ('щоб')."
       }
     ];
 
+    const QUESTIONS_PER_TEST = 12;
+    let activeQuestions = [];
     let currentQuestionIndex = 0;
     let score = 0;
     let selectedOption = null;
@@ -255,7 +510,29 @@
     nextBtn.addEventListener('click', nextQuestion);
     restartBtn.addEventListener('click', startQuiz);
 
+    function shuffleArray(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function prepareQuestions() {
+      const shuffledBank = shuffleArray(questionBank);
+      const selected = shuffledBank.slice(0, QUESTIONS_PER_TEST);
+
+      activeQuestions = selected.map(q => {
+        return {
+          ...q,
+          options: shuffleArray(q.options)
+        };
+      });
+    }
+
     function startQuiz() {
+      prepareQuestions();
       currentQuestionIndex = 0;
       score = 0;
       startScreen.classList.add('hidden');
@@ -269,10 +546,10 @@
       feedback.classList.add('hidden');
       nextBtn.classList.add('hidden');
 
-      const q = questions[currentQuestionIndex];
-      questionNumber.textContent = `Питання ${currentQuestionIndex + 1} з ${questions.length}`;
+      const q = activeQuestions[currentQuestionIndex];
+      questionNumber.textContent = `Питання ${currentQuestionIndex + 1} з ${QUESTIONS_PER_TEST}`;
       scoreCounter.textContent = `Бал: ${score}`;
-      progressBar.style.width = `${((currentQuestionIndex + 1) / questions.length) * 100}%`;
+      progressBar.style.width = `${((currentQuestionIndex + 1) / QUESTIONS_PER_TEST) * 100}%`;
 
       questionText.textContent = q.question;
       questionHint.textContent = q.hint ? `Підказка: ${q.hint}` : '';
@@ -280,27 +557,28 @@
       optionsContainer.innerHTML = '';
       q.options.forEach((opt, index) => {
         const btn = document.createElement('button');
-        btn.className = "w-full text-left p-4 rounded-xl border border-slate-200 hover:border-amber-400 hover:bg-amber-50 transition font-medium text-slate-700 flex justify-between items-center";
+        // Optimized padding and active touch press state for mobile devices
+        btn.className = "w-full text-left p-3.5 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-amber-400 dark:hover:border-amber-400 active:scale-[0.99] bg-white dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-slate-700/80 transition-all font-medium text-slate-700 dark:text-slate-200 text-sm sm:text-base flex justify-between items-center touch-manipulation";
         btn.textContent = opt.text;
-        btn.addEventListener('click', () => selectAnswer(index, btn));
+        btn.addEventListener('click', () => selectAnswer(index));
         optionsContainer.appendChild(btn);
       });
     }
 
-    function selectAnswer(index, btnElement) {
-      if (selectedOption !== null) return; // Prevent multiple choices
+    function selectAnswer(index) {
+      if (selectedOption !== null) return;
 
       selectedOption = index;
-      const q = questions[currentQuestionIndex];
+      const q = activeQuestions[currentQuestionIndex];
       const isCorrect = q.options[index].isCorrect;
       const optionButtons = optionsContainer.children;
 
       for (let i = 0; i < optionButtons.length; i++) {
         optionButtons[i].disabled = true;
         if (q.options[i].isCorrect) {
-          optionButtons[i].classList.add('bg-emerald-100', 'border-emerald-500', 'text-emerald-800');
+          optionButtons[i].classList.add('bg-emerald-100', 'dark:bg-emerald-950/80', 'border-emerald-500', 'text-emerald-900', 'dark:text-emerald-200');
         } else if (i === index && !isCorrect) {
-          optionButtons[i].classList.add('bg-rose-100', 'border-rose-500', 'text-rose-800');
+          optionButtons[i].classList.add('bg-rose-100', 'dark:bg-rose-950/80', 'border-rose-500', 'text-rose-900', 'dark:text-rose-200');
         } else {
           optionButtons[i].classList.add('opacity-50');
         }
@@ -308,21 +586,26 @@
 
       if (isCorrect) {
         score++;
-        feedback.className = "rounded-xl p-4 mb-6 border bg-emerald-50 border-emerald-200 text-emerald-900";
-        feedback.innerHTML = `<strong>Вірно!</strong> ${q.explanation}`;
+        feedback.className = "rounded-xl p-3.5 sm:p-4 mb-4 sm:mb-6 border bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200";
+        feedback.innerHTML = `<strong>Правильно!</strong> ${q.explanation}`;
       } else {
-        feedback.className = "rounded-xl p-4 mb-6 border bg-rose-50 border-rose-200 text-rose-900";
-        feedback.innerHTML = `<strong>Невірно.</strong> ${q.explanation}`;
+        feedback.className = "rounded-xl p-3.5 sm:p-4 mb-4 sm:mb-6 border bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800 text-rose-900 dark:text-rose-200";
+        feedback.innerHTML = `<strong>Неправильно.</strong> ${q.explanation}`;
       }
 
       scoreCounter.textContent = `Бал: ${score}`;
       feedback.classList.remove('hidden');
       nextBtn.classList.remove('hidden');
+
+      // Auto-scroll on small screen devices to make feedback visible instantly
+      setTimeout(() => {
+        feedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 50);
     }
 
     function nextQuestion() {
       currentQuestionIndex++;
-      if (currentQuestionIndex < questions.length) {
+      if (currentQuestionIndex < QUESTIONS_PER_TEST) {
         showQuestion();
       } else {
         showResults();
@@ -333,8 +616,8 @@
       quizScreen.classList.add('hidden');
       resultScreen.classList.remove('hidden');
 
-      const percentage = Math.round((score / questions.length) * 100);
-      const passedB1 = percentage >= 65; // Threshold for B1
+      const percentage = Math.round((score / QUESTIONS_PER_TEST) * 100);
+      const passedB1 = percentage >= 65;
 
       const resultBadge = document.getElementById('result-badge');
       const resultTitle = document.getElementById('result-title');
@@ -343,25 +626,27 @@
       const finalPercentage = document.getElementById('final-percentage');
       const finalLevel = document.getElementById('final-level');
 
-      finalScore.textContent = `${score} / ${questions.length}`;
+      finalScore.textContent = `${score} / ${QUESTIONS_PER_TEST}`;
       finalPercentage.textContent = `${percentage}%`;
 
       if (passedB1) {
-        resultBadge.className = "w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl font-extrabold shadow-inner bg-emerald-100 text-emerald-600";
+        resultBadge.className = "w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl sm:text-3xl font-extrabold shadow-inner bg-emerald-100 dark:bg-emerald-900/60 text-emerald-600 dark:text-emerald-300";
         resultBadge.textContent = "B1";
         resultTitle.textContent = "Вітаємо! Ваш рівень — B1";
-        resultDescription.textContent = "Ви впевнено володієте основними граматичними структурами та лексикою рівня B1. Продовжуйте в тому ж дусі!";
+        resultDescription.textContent = "Ви впевнено володієте основними граматичними структурами та лексикою рівня B1. Чудовий результат!";
         finalLevel.textContent = "B1 (Підтверджено)";
-        finalLevel.className = "font-bold text-emerald-600";
+        finalLevel.className = "font-bold text-emerald-600 dark:text-emerald-400";
       } else {
-        resultBadge.className = "w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl font-extrabold shadow-inner bg-amber-100 text-amber-600";
+        resultBadge.className = "w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl font-extrabold shadow-inner bg-amber-100 dark:bg-amber-900/60 text-amber-600 dark:text-amber-300";
         resultBadge.textContent = "A2";
         resultTitle.textContent = "Ваш рівень — A2";
-        resultDescription.textContent = "Ви маєте хорошу базу A2, але для повноцінного B1 варто додатково повторити складові речення, Passiv та Konjunktiv II.";
-        finalLevel.textContent = "A2 (Потребує практики для B1)";
-        finalLevel.className = "font-bold text-amber-600";
+        resultDescription.textContent = "У вас гарна база A2, але для впевненого B1 варто ще попрактикувати складні речення та граматику.";
+        finalLevel.textContent = "A2 (Потребує практики)";
+        finalLevel.className = "font-bold text-amber-600 dark:text-amber-400";
       }
     }
   </script>
 </body>
 </html>
+
+
